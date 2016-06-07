@@ -6,21 +6,21 @@
  * Time: 17:18
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php"); ?>
-    <h1>Импорт/Экспорт хайлод блоков</h1>
+    <h1>РРјРїРѕСЂС‚/Р­РєСЃРїРѕСЂС‚ С…Р°Р№Р»РѕРґ Р±Р»РѕРєРѕРІ</h1>
 
     <section>
-        <h2>Экспорт</h2>
+        <h2>Р­РєСЃРїРѕСЂС‚</h2>
         <form action="ExportImportHLBlock.php" method="post" name="export">
-            <input type="text" name="exportID" placeholder="Введите id хайлода - и получите ссылку на файлик"
+            <input type="text" name="exportID" placeholder="Р’РІРµРґРёС‚Рµ id С…Р°Р№Р»РѕРґР° - Рё РїРѕР»СѓС‡РёС‚Рµ СЃСЃС‹Р»РєСѓ РЅР° С„Р°Р№Р»РёРє"
                    style="width: 300px;">
             <input type="submit" value="Go!">
         </form>
     </section>
 
     <section>
-        <h2>Импорт</h2>
+        <h2>РРјРїРѕСЂС‚</h2>
         <form action="ExportImportHLBlock.php" method="post" name="import">
-            <input type="text" name="importPath" placeholder="Введите ссылку на файл" style="width: 300px;">
+            <input type="text" name="importPath" placeholder="Р’РІРµРґРёС‚Рµ СЃСЃС‹Р»РєСѓ РЅР° С„Р°Р№Р»" style="width: 300px;">
             <input type="submit" value="Go!">
         </form>
     </section>
@@ -34,7 +34,7 @@ if ($_POST['exportID']) {
     $rsData = \Bitrix\Highloadblock\HighloadBlockTable::getById($highloadID);
     if ($arData = $rsData->fetch()) {
 
-        showSuccessMessage('Найден хайлоад-блок ' . $highloadID);
+        showSuccessMessage('РќР°Р№РґРµРЅ С…Р°Р№Р»РѕР°Рґ-Р±Р»РѕРє ' . $highloadID);
 
         $Entity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($arData);
         $arResult = array();
@@ -42,7 +42,7 @@ if ($_POST['exportID']) {
         $arResult['HIGHLOAD']['TABLE_NAME'] = $arData['TABLE_NAME'];
 
 
-        showSuccessMessage('Выборка связанных пользовательских полей');
+        showSuccessMessage('Р’С‹Р±РѕСЂРєР° СЃРІСЏР·Р°РЅРЅС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС… РїРѕР»РµР№');
 
         $arFields = CUserTypeEntity::GetList(
             array(), array(
@@ -56,7 +56,7 @@ if ($_POST['exportID']) {
             unset($fields['ID']);
             unset($fields['ENTITY_ID']);
             $arNewFields[] = $fields;
-            //предположим, что в хайлоаде только одна картинка на элемент
+            //РїСЂРµРґРїРѕР»РѕР¶РёРј, С‡С‚Рѕ РІ С…Р°Р№Р»РѕР°РґРµ С‚РѕР»СЊРєРѕ РѕРґРЅР° РєР°СЂС‚РёРЅРєР° РЅР° СЌР»РµРјРµРЅС‚
             if ($fields['USER_TYPE_ID'] == 'file' && !$arPropertyFile) {
                 $arPropertyFile = $fields['FIELD_NAME'];
             }
@@ -64,15 +64,15 @@ if ($_POST['exportID']) {
 
         $arResult['FIELDS'] = $arNewFields;
 
-        showSuccessMessage('Выгрузка данных');
+        showSuccessMessage('Р’С‹РіСЂСѓР·РєР° РґР°РЅРЅС‹С…');
 
-        // Создадим объект - запрос
+        // РЎРѕР·РґР°РґРёРј РѕР±СЉРµРєС‚ - Р·Р°РїСЂРѕСЃ
         $Query = new \Bitrix\Main\Entity\Query($Entity);
-        // Зададим параметры запроса
+        // Р—Р°РґР°РґРёРј РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСЂРѕСЃР°
         $Query->setSelect(Array('*'));
-        // Выполним запрос
+        // Р’С‹РїРѕР»РЅРёРј Р·Р°РїСЂРѕСЃ
         $result = $Query->exec();
-        // Получаем результат
+        // РџРѕР»СѓС‡Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚
         $highloadData = array();
         while ($res = $result->fetch()) {
             unset($res['ID']);
@@ -85,24 +85,24 @@ if ($_POST['exportID']) {
         }
 
         if($highloadData){
-            showSuccessMessage('Количество выгруженных элементов ' . count($highloadData));
+            showSuccessMessage('РљРѕР»РёС‡РµСЃС‚РІРѕ РІС‹РіСЂСѓР¶РµРЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ ' . count($highloadData));
             $arResult['DATA'] = $highloadData;
         }
 
-        showSuccessMessage('Сохранение результата в файл');
+        showSuccessMessage('РЎРѕС…СЂР°РЅРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р° РІ С„Р°Р№Р»');
 
         $fileName = 'data' . $highloadID . '.json';
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $fileName; //абсолютный путь до файла
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $fileName; //Р°Р±СЃРѕР»СЋС‚РЅС‹Р№ РїСѓС‚СЊ РґРѕ С„Р°Р№Р»Р°
 
         file_put_contents($filePath, json_encode($arResult));
 
-        //относительный путь
+        //РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Р№ РїСѓС‚СЊ
         $arPath = 'http://' . $_SERVER['SERVER_NAME'] . DIRECTORY_SEPARATOR . $fileName;
 
-        showSuccessMessage('Скопируйте ссылку ' .$arPath);
+        showSuccessMessage('РЎРєРѕРїРёСЂСѓР№С‚Рµ СЃСЃС‹Р»РєСѓ ' .$arPath);
     }
     else {
-        showErrorMessage('Не удалось загрузить хайлоад по id');
+        showErrorMessage('РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С…Р°Р№Р»РѕР°Рґ РїРѕ id');
     }
     return;
 }
@@ -113,21 +113,21 @@ if ($_POST['importPath']) {
     $data = json_decode(file_get_contents($_POST['importPath']), true);
 
     if ($data['HIGHLOAD']) {
-        showSuccessMessage('Пытаемся создать новый хайлоад');
+        showSuccessMessage('РџС‹С‚Р°РµРјСЃСЏ СЃРѕР·РґР°С‚СЊ РЅРѕРІС‹Р№ С…Р°Р№Р»РѕР°Рґ');
         $res = \Bitrix\Highloadblock\HighloadBlockTable::add(array(
             'NAME' => $data['HIGHLOAD']['NAME'],
             'TABLE_NAME' => $data['HIGHLOAD']['TABLE_NAME'],
         ))->getId();
 
         if (!$res) {
-            showErrorMessage('Не удалось создать новый хайлоад');
+            showErrorMessage('РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РЅРѕРІС‹Р№ С…Р°Р№Р»РѕР°Рґ');
         }
 
-        showSuccessMessage('Создан новый хайлоад ID ' . $res );
+        showSuccessMessage('РЎРѕР·РґР°РЅ РЅРѕРІС‹Р№ С…Р°Р№Р»РѕР°Рґ ID ' . $res );
 
 
         if ($data['FIELDS'] && $res) {
-            showSuccessMessage('Создаем пользовательские поля для нового хайлоада');
+            showSuccessMessage('РЎРѕР·РґР°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёРµ РїРѕР»СЏ РґР»СЏ РЅРѕРІРѕРіРѕ С…Р°Р№Р»РѕР°РґР°');
             foreach ($data['FIELDS'] as $item) {
                 $item['ENTITY_ID'] = 'HLBLOCK_' . $res;
                 $oUserTypeEntity = new CUserTypeEntity();
@@ -136,7 +136,7 @@ if ($_POST['importPath']) {
         }
 
         if ($data['DATA']) {
-            showSuccessMessage('Пытаемся вставить данные');
+            showSuccessMessage('РџС‹С‚Р°РµРјСЃСЏ РІСЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ');
             $entityData = \Bitrix\Highloadblock\HighloadBlockTable::getById($res);
             if ($arData = $entityData->fetch()) {
                 $Entity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($arData);
@@ -144,7 +144,7 @@ if ($_POST['importPath']) {
             }
 
             if (!$DataClass) {
-                showErrorMessage('Ошибка при создании $DataClass для работы с хайлоадом');
+                showErrorMessage('РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё $DataClass РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С…Р°Р№Р»РѕР°РґРѕРј');
             }
 
             $countAllData = count($data['DATA']);
@@ -169,7 +169,7 @@ if ($_POST['importPath']) {
                 }
             }
 
-            showSuccessMessage('Вставлено: ' . $count . ' из ' . $countAllData);
+            showSuccessMessage('Р’СЃС‚Р°РІР»РµРЅРѕ: ' . $count . ' РёР· ' . $countAllData);
 
         }
     }
