@@ -6,12 +6,12 @@
  * Time: 17:18
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php"); ?>
-    <h1>Импорт/Экспорт хайлод блоков</h1>
+    <h1>Импорт/Экспорт хайлоад блоков</h1>
 
     <section>
         <h2>Экспорт</h2>
         <form action="ExportImportHLBlock.php" method="post" name="export">
-            <input type="text" name="exportID" placeholder="Введите id хайлода - и получите ссылку на файлик"
+            <input type="text" name="exportID" placeholder="Введите id хайлоада - и получите ссылку на файлик"
                    style="width: 300px;">
             <input type="submit" value="Go!">
         </form>
