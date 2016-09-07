@@ -10,7 +10,7 @@ require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_be
 
     <section>
         <h2>Экспорт</h2>
-        <form action="ExportImportHLBlock.php" method="post" name="export">
+        <form action="<?=$_SERVER["PHP_SELF"]?>" method="post" name="export">
             <input type="text" name="exportID" placeholder="Введите id хайлоада - и получите ссылку на файлик"
                    style="width: 300px;">
             <input type="submit" value="Go!">
@@ -19,7 +19,7 @@ require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_be
 
     <section>
         <h2>Импорт</h2>
-        <form action="ExportImportHLBlock.php" method="post" name="import">
+        <form action="<?=$_SERVER["PHP_SELF"]?>" method="post" name="import">
             <input type="text" name="importPath" placeholder="Введите ссылку на файл" style="width: 300px;">
             <input type="submit" value="Go!">
         </form>
@@ -114,13 +114,17 @@ if ($_POST['importPath']) {
 
     if ($data['HIGHLOAD']) {
         showSuccessMessage('Пытаемся создать новый хайлоад');
-        $res = \Bitrix\Highloadblock\HighloadBlockTable::add(array(
+
+        $dbRes = \Bitrix\Highloadblock\HighloadBlockTable::add(array(
             'NAME' => $data['HIGHLOAD']['NAME'],
             'TABLE_NAME' => $data['HIGHLOAD']['TABLE_NAME'],
-        ))->getId();
+        ));
 
-        if (!$res) {
-            showErrorMessage('Не удалось создать новый хайлоад');
+
+        if (!$res = $dbRes->getId()) {
+            $errors = $dbRes->getErrorMessages();
+            $errors[] = 'Не удалось создать новый хайлоад';
+            showErrorMessage($errors);
         }
 
         showSuccessMessage('Создан новый хайлоад ID ' . $res );
@@ -181,6 +185,9 @@ function showSuccessMessage($message){
 }
 
 function showErrorMessage($message){
+    if (is_array($message)){
+        $message = implode('<br>', $message);
+    }
     echo '<br><p style="color:darkred; font-weight: bold;">' . $message . '</p>';
     die();
 }
